@@ -70,6 +70,7 @@ Notes on setting up the project
         py36: commands succeeded
         flake8: commands succeeded
         ```
+
  - I log into Travis with my Github account. I can see and configure the builds for this repository (I have admin rights on the repo).
    I can trigger a build without pushing to the repository (More Options / Trigger Build). Everything runs fine!
  - I push this to a new branch : Travis triggers tests on this branch (even without creating a pull request).
@@ -92,6 +93,17 @@ Notes on setting up the project
                 repo: Quantmetry/pipeasy-spark
         ```
 
+ - I update the version and push a tag:
+
+        ```
+        $ bumpversion patch
+        $ git push --tags
+        $ git push
+        ```
+
+  I can indeed see the tag (and an associated release) on the github interface. However Travis does not deploy on this commit. This is the intended behaviour. Be [default](https://docs.travis-ci.com/user/deployment/pypi/) travis deploys only on the `master` branch.
+
+ - I setup an account on [readthedoc.io](https://readthedocs.org/). Selecting the repo is enough to have the documentation online! 
 
 Features
 --------
