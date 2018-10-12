@@ -74,6 +74,24 @@ Notes on setting up the project
    I can trigger a build without pushing to the repository (More Options / Trigger Build). Everything runs fine!
  - I push this to a new branch : Travis triggers tests on this branch (even without creating a pull request).
    The tests fail because I changed `README.rst` to `README.md`. I need to also change this in `setup.py`.
+ - I create an account on pypi.org and link it to the current project ([documentation](https://cookiecutter-pypackage.readthedocs.io/en/latest/travis_pypi_setup.html#travis-pypi-setup))
+
+        ```
+        $ brew install travis
+        $ travis encrypt ****** --add deploy.password
+        ```
+
+  This modifies the `.travis.yml` file. I customize it slightly because the package name is wrong:
+
+        ```
+        # .travis.yml
+        deploy:
+            on:
+                tags: true
+                # the repo was not correct:
+                repo: Quantmetry/pipeasy-spark
+        ```
+
 
 Features
 --------
