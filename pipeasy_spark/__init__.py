@@ -4,4 +4,4 @@
 
 __author__ = """Benjamin Habert"""
 __email__ = 'bhabert@quantmetry.com'
-__version__ = '0.1.1'
+__version__ = '0.1.2'
