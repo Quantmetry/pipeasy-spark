@@ -72,7 +72,8 @@ Notes on setting up the project
         ```
  - I log into Travis with my Github account. I can see and configure the builds for this repository (I have admin rights on the repo).
    I can trigger a build without pushing to the repository (More Options / Trigger Build). Everything runs fine!
-
+ - I push this to a new branch : Travis triggers tests on this branch (even without creating a pull request).
+   The tests fail because I changed `README.rst` to `README.md`. I need to also change this in `setup.py`.
 
 Features
 --------
