@@ -8,6 +8,8 @@ Installation
 Stable release
 --------------
 
+(test: addig stuff manually)
+
 To install pipeasy-spark, run this command in your terminal:
 
 .. code-block:: console
