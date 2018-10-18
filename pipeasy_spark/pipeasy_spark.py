@@ -70,6 +70,7 @@ def map_by_dtypes(df_pipe, target_name):
     # Preparing target variable
     labelIndexer = StringIndexer(inputCol=target_name, outputCol='label')
     stages += [labelIndexer]
+    labels = labelIndexer.labels
 
     # Combine everything
     assemblerInputs = [c+'ClassVec' for c in cat_columns] + [c+'Scaled' for c in num_columns]
@@ -78,4 +79,4 @@ def map_by_dtypes(df_pipe, target_name):
 
     # Create a Pipeline
     pipeline = Pipeline(stages=stages)
-    return pipeline
+    return pipeline, labels
