@@ -78,4 +78,3 @@ def map_by_dtypes(df_pipe, target_name):
 
     # Create a Pipeline
     pipeline = Pipeline(stages=stages)
-    return pipeline
