@@ -17,7 +17,7 @@ map_by_column()     allows mapping transformations at a more detailed level. Eac
                     of the dataframe (or subset thereof) can be assigned a specific
                     sequence of transformations.
 
-Each function returns a Spark dataframe that is ready to be used by Spark.ml
+Each function returns a pyspark.ml Pipeline object.
 '''
 
 def map_by_dtypes(df_pipe, target_name):
@@ -28,8 +28,8 @@ def map_by_dtypes(df_pipe, target_name):
     Categorical columns are taken through a StringIndexer > OneHotEncoder
     sequence and numerical ones through a VectorAssembler > StandardScaler sequence.
     The target variable is set in the arguments and a StringIndexer is applied to it.
-    The transformed features are then assembled by a VectorAssembler and a transformed
-    dataframe is returned, ready to be used in spark.ml
+    The transformed features are then assembled by a VectorAssembler and a pyspark.ml
+    pipeline object is returned.
 
     Parameters:
 
@@ -78,5 +78,4 @@ def map_by_dtypes(df_pipe, target_name):
 
     # Create a Pipeline
     pipeline = Pipeline(stages=stages)
-    df_pipe_out = pipeline.fit(df_pipe).transform(df_pipe)
-    return df_pipe_out
+    return pipeline
