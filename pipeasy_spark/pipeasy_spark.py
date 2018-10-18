@@ -39,6 +39,7 @@ def map_by_dtypes(df_pipe, target_name):
     TODO:
     Make the user choose which transformations are to be applied for each dtype.
     Maybe pass dtypes as dictionaries as opposed to the string/not string dichotomy.
+    Handle unseen labels.
     '''
     cat_columns = [item[0] for item in df_pipe.dtypes if item[1]=='string']
     num_columns = [item[0] for item in df_pipe.dtypes if (not item[1]=='string'
