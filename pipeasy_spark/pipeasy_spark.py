@@ -4,8 +4,7 @@
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import OneHotEncoderEstimator, StringIndexer, VectorAssembler, StandardScaler
 
-'''
-The pipeasy-spark package provides a set of convenience classes and functions that
+'''The pipeasy-spark package provides a set of convenience classes and functions that
 make it easier to map each column of a Spark dataframe (or subsets of columns) to
 user-specified transformations. Increasingly complex features are provided:
 
@@ -18,11 +17,11 @@ map_by_column()     allows mapping transformations at a more detailed level. Eac
                     sequence of transformations.
 
 Each function returns a pyspark.ml Pipeline object.
+
 '''
 
 def map_by_dtypes(df_pipe, target_name):
-    '''
-    Maps the columns of a dataframe to specific transformations depending on their
+    '''Maps the columns of a dataframe to specific transformations depending on their
     dtype.
 
     Categorical columns are taken through a StringIndexer > OneHotEncoder
@@ -40,6 +39,7 @@ def map_by_dtypes(df_pipe, target_name):
     Make the user choose which transformations are to be applied for each dtype.
     Maybe pass dtypes as dictionaries as opposed to the string/not string dichotomy.
     Handle unseen labels.
+
     '''
     cat_columns = [item[0] for item in df_pipe.dtypes if item[1]=='string']
     num_columns = [item[0] for item in df_pipe.dtypes if (not item[1]=='string'
