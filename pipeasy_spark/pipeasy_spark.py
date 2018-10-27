@@ -61,13 +61,6 @@ def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
     stages = []
     # Preparing categorical columns
     for cat_column in cat_columns:
-        # # Catgorical indexing
-        # stringIndexer = StringIndexer(inputCol=cat_column,
-        #                               outputCol=cat_column+'Index')
-        # # One-hot encoding
-        # encoder = OneHotEncoderEstimator(inputCols=[stringIndexer.getOutputCol()],
-        #                                  outputCols=[cat_column+'ClassVec'])
-
         # Chain transformers
         cat_column_stages = []
         for idx, transformer in enumerate(cat_transformers):
@@ -84,15 +77,6 @@ def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
 
     # Preparing numerical columns
     for num_column in num_columns:
-        # #vector assembler
-        # num_assembler = VectorAssembler(inputCols=[num_column],
-        #                                 outputCol=num_column+'Assembled')
-        # # scaling
-        # scaler = StandardScaler(inputCol=num_assembler.getOutputCol(),
-        #                         outputCol=num_column+'Scaled')
-        # # add stages
-        # stages += num_stages
-
         # Chain transformers
         num_column_stages = []
         for idx, transformer in enumerate(num_transformers):
