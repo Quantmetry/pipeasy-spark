@@ -20,7 +20,7 @@ Each function returns a pyspark.ml Pipeline object.
 
 '''
 
-def map_by_dtypes(df_pipe, target_name):
+def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
     '''Maps the columns of a dataframe to specific transformations depending on their
     dtype.
 
@@ -32,8 +32,10 @@ def map_by_dtypes(df_pipe, target_name):
 
     Parameters:
 
-    df_pipe         a Spark dataframe to be transformed
-    target_name     the name of the target column
+    df_pipe             a Spark dataframe to be transformed
+    target_name         the name of the target column
+    cat_transformers    list of pyspark.ml transformers for categorical columns
+    num_transformers    list of pyspark.ml transformers for numerical columns
 
     TODO:
     Make the user choose which transformations are to be applied for each dtype.
@@ -48,32 +50,56 @@ def map_by_dtypes(df_pipe, target_name):
     stages = []
     # Preparing categorical columns
     for cat_column in cat_columns:
-        # Catgorical indexing
-        stringIndexer = StringIndexer(inputCol=cat_column,
-                                      outputCol=cat_column+'Index')
-        # One-hot encoding
-        encoder = OneHotEncoderEstimator(inputCols=[stringIndexer.getOutputCol()],
-                                         outputCols=[cat_column+'ClassVec'])
-        # Add stages
-        stages += [stringIndexer, encoder]
+        # # Catgorical indexing
+        # stringIndexer = StringIndexer(inputCol=cat_column,
+        #                               outputCol=cat_column+'Index')
+        # # One-hot encoding
+        # encoder = OneHotEncoderEstimator(inputCols=[stringIndexer.getOutputCol()],
+        #                                  outputCols=[cat_column+'ClassVec'])
+
+        # Chain transformers
+        cat_column_stages = []
+        for idx, transformer in enumerate(cat_transformers):
+            if idx==0:
+                transformer_args = dict(inputCol=cat_column, outputCol=cat_column+'_indexed')
+            else:
+                transformer_args = dict(inputCols=[cat_transformers[idx-1].getOutputCol()], outputCols=[cat_column+'_transformed'])
+            step = transformer(**transformer_args)
+            cat_column_stages += step
+
+        # Add stages to main stages list
+        stages += cat_column_stages
 
     # Preparing numerical columns
     for num_column in num_columns:
-        #vector assembler
-        num_assembler = VectorAssembler(inputCols=[num_column],
-                                        outputCol=num_column+'Assembled')
-        # scaling
-        scaler = StandardScaler(inputCol=num_assembler.getOutputCol(),
-                                outputCol=num_column+'Scaled')
-        # add stages
-        stages += [num_assembler, scaler]
+        # #vector assembler
+        # num_assembler = VectorAssembler(inputCols=[num_column],
+        #                                 outputCol=num_column+'Assembled')
+        # # scaling
+        # scaler = StandardScaler(inputCol=num_assembler.getOutputCol(),
+        #                         outputCol=num_column+'Scaled')
+        # # add stages
+        # stages += num_stages
+
+        # Chain transformers
+        num_column_stages = []
+        for idx, transformer in enumerate(num_transformers):
+            if idx==0:
+                transformer_args = dict(inputCol=num_column, outputCol=num_column+'_assembled')
+            else:
+                transformer_args = dict(inputCols=num_transformers[idx-1].getOutputCol(), outputCols=num_column+'_scaled')
+            step = transformer(**transformer_args)
+            num_column_stages += step
+
+        # Add stages to main stages list
+        stages += num_column_stages
 
     # Preparing target variable
     labelIndexer = StringIndexer(inputCol=target_name, outputCol='label')
     stages += [labelIndexer]
 
     # Combine everything
-    assemblerInputs = [c+'ClassVec' for c in cat_columns] + [c+'Scaled' for c in num_columns]
+    assemblerInputs = [c+'_transformed' for c in cat_columns] + [c+'_scaled' for c in num_columns]
     assembler = VectorAssembler(inputCols=assemblerInputs, outputCol='features')
     stages += [assembler]
 
