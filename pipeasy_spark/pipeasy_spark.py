@@ -2,7 +2,10 @@
 
 """Main module."""
 from pyspark.ml import Pipeline
-from pyspark.ml.feature import StringIndexer, VectorAssembler
+from pyspark.ml.feature import (
+    StringIndexer,
+    VectorAssembler,
+)
 
 """The pipeasy-spark package provides a set of convenience classes and functions that
 make it easier to map each column of a Spark dataframe (or subsets of columns) to
@@ -48,7 +51,12 @@ def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
 
     Tested with the following transformers :
     import pipeasy_spark as ppz
-    from pyspark.ml.feature import OneHotEncoderEstimator, StringIndexer, VectorAssembler, StandardScaler
+    from pyspark.ml.feature import (
+        OneHotEncoderEstimator,
+        StringIndexer,
+        VectorAssembler,
+        StandardScaler,
+    )
     ppz_pipeline= ppz.map_by_dtypes(df_pipe,
                                     target_name='Survived',
                                     cat_transformers=[StringIndexer, OneHotEncoderEstimator],
@@ -67,10 +75,14 @@ def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
         for idx, transformer in enumerate(cat_transformers):
             if idx == 0:
                 transformer_args = dict(
-                    inputCol=cat_column, outputCol=cat_column + '_indexed')
+                    inputCol=cat_column,
+                    outputCol=cat_column + '_indexed'
+                )
             else:
                 transformer_args = dict(
-                    inputCols=[cat_column_stages[idx - 1].getOutputCol()], outputCols=[cat_column + '_transformed'])
+                    inputCols=[cat_column_stages[idx - 1].getOutputCol()],
+                    outputCols=[cat_column + '_transformed']
+                )
             cat_column_stages += [transformer(**transformer_args)]
 
         # Add stages to main stages list
@@ -83,10 +95,12 @@ def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
         for idx, transformer in enumerate(num_transformers):
             if idx == 0:
                 transformer_args = dict(
-                    inputCols=[num_column], outputCol=num_column + '_assembled')
+                    inputCols=[num_column],
+                    outputCol=num_column + '_assembled')
             else:
                 transformer_args = dict(
-                    inputCol=num_column_stages[idx - 1].getOutputCol(), outputCol=num_column + '_scaled')
+                    inputCol=num_column_stages[idx - 1].getOutputCol(),
+                    outputCol=num_column + '_scaled')
             num_column_stages += [transformer(**transformer_args)]
 
         # Add stages to main stages list
