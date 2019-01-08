@@ -106,3 +106,4 @@ ENV/
 .vscode/
 .idea/
 spark-warehouse/
+.DS_Store
