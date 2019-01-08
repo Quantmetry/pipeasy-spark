@@ -2,7 +2,7 @@
 
 """Main module."""
 from pyspark.ml import Pipeline
-from pyspark.ml.feature import OneHotEncoderEstimator, StringIndexer, VectorAssembler, StandardScaler
+from pyspark.ml.feature import StringIndexer, VectorAssembler
 
 """The pipeasy-spark package provides a set of convenience classes and functions that
 make it easier to map each column of a Spark dataframe (or subsets of columns) to
@@ -55,9 +55,9 @@ def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
                                     num_transformers=[VectorAssembler, StandardScaler])
 
     """
-    cat_columns = [item[0] for item in df_pipe.dtypes if item[1]=='string']
-    num_columns = [item[0] for item in df_pipe.dtypes if (not item[1]=='string'
-                                                          and not item[0]==target_name)]
+    cat_columns = [item[0] for item in df_pipe.dtypes if item[1] == 'string']
+    num_columns = [item[0] for item in df_pipe.dtypes if (not item[1] == 'string'
+                                                          and not item[0] == target_name)]
 
     stages = []
     # Preparing categorical columns
