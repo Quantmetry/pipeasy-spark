@@ -7,7 +7,7 @@ from pyspark.ml.feature import (
     VectorAssembler,
 )
 
-'''The pipeasy-spark package provides a set of convenience classes and functions that
+"""The pipeasy-spark package provides a set of convenience classes and functions that
 make it easier to map each column of a Spark dataframe (or subsets of columns) to
 user-specified transformations. Increasingly complex features are provided:
 
@@ -21,11 +21,11 @@ map_by_column()     allows mapping transformations at a more detailed level. Eac
 
 Each function returns a pyspark.ml Pipeline object.
 
-'''
+"""
 
 
 def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
-    '''Maps the columns of a dataframe to specific transformations depending on their
+    """Maps the columns of a dataframe to specific transformations depending on their
     dtype.
 
     Categorical columns are taken through the cat_stransformers sequence
@@ -62,7 +62,7 @@ def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
                                     cat_transformers=[StringIndexer, OneHotEncoderEstimator],
                                     num_transformers=[VectorAssembler, StandardScaler])
 
-    '''
+    """
     cat_columns = [item[0] for item in df_pipe.dtypes if item[1] == 'string']
     num_columns = [item[0] for item in df_pipe.dtypes if (not item[1] == 'string'
                                                           and not item[0] == target_name)]
@@ -107,12 +107,12 @@ def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
         stages += num_column_stages
 
     # Preparing target variable
-    labelIndexer = StringIndexer(inputCol=target_name, outputCol='label')
-    stages += [labelIndexer]
+    label_indexer = StringIndexer(inputCol=target_name, outputCol='label')
+    stages += [label_indexer]
 
     # Combine everything
-    assemblerInputs = [c+'_transformed' for c in cat_columns] + [c+'_scaled' for c in num_columns]
-    assembler = VectorAssembler(inputCols=assemblerInputs, outputCol='features')
+    assembler_inputs = [c+'_transformed' for c in cat_columns] + [c+'_scaled' for c in num_columns]
+    assembler = VectorAssembler(inputCols=assembler_inputs, outputCol='features')
     stages += [assembler]
 
     # Create a Pipeline
