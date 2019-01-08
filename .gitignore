@@ -104,3 +104,5 @@ ENV/
 
 # Editors configuration
 .vscode/
+.idea/
+spark-warehouse/

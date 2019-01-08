@@ -102,6 +102,8 @@ Notes on setting up the project
   (see [this build](https://travis-ci.org/Quantmetry/pipeasy-spark/jobs/440637481) for instance). However the library
   was indeed deployed to pypi: I can pip install it..
 
+Note: when Omar pushed new commits, travis does not report their status.
+
 Features
 --------
 
