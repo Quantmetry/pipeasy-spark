@@ -34,6 +34,8 @@ In order to contribute to the project, here is how you should configure your loc
     (.venv) $ pip install -r requirements_dev.txt
     # installing the project dependencies
     (.venv) $ make install
+    # start the demo notebook
+    (.venv) $ make notebook
     ```
 
     **Note:** the `make install` step installs the package in *editable* mode into the local virtual environment.
