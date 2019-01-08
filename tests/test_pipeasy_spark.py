@@ -1,25 +1,32 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+# coding: utf8
 """Tests for `pipeasy_spark` package."""
-
 import pytest
 
+import pyspark
 
 from pipeasy_spark import pipeasy_spark
 
 
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
-
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+def test_dummy():
+    assert True
 
 
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+@pytest.fixture(scope='session')
+def spark():
+    spark = pyspark.sql.SparkSession \
+        .builder \
+        .master('local[1]') \
+        .appName("Spark session for unit tests") \
+        .getOrCreate()
+    return spark
+
+
+def test_spark(spark):
+    df = spark.createDataFrame([
+        ('Benjamin', 178.1, 0),
+        ('Omar', 178.1, 1),
+    ], schema=['name', 'height', 'target'])
+
+    pipeline = pipeasy_spark.map_by_dtypes(df, 'target', [], [])
+
+    assert isinstance(pipeline, pyspark.ml.Pipeline)

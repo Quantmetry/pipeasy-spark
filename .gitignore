@@ -104,3 +104,4 @@ ENV/
 
 # Editors configuration
 .vscode/
+.idea/

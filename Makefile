@@ -36,7 +36,7 @@ clean-build: ## remove build artifacts
 	rm -fr dist/
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -fr {} +
-	find . -name '*.egg' -exec rm -f {} +
+	find . -name '*.egg' -exec rm -fr {} +
 
 clean-pyc: ## remove Python file artifacts
 	find . -name '*.pyc' -exec rm -f {} +
@@ -54,7 +54,7 @@ lint: ## check style with flake8
 	flake8 pipeasy_spark tests
 
 test: ## run tests quickly with the default Python
-	python -m pytest tests/
+	pytest -s tests/
 
 test-all: ## run tests on every Python version with tox
 	tox
@@ -85,4 +85,4 @@ dist: clean ## builds source and wheel package
 	ls -l dist
 
 install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+	pip install -e .
