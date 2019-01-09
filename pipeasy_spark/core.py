@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from pyspark.ml import Pipeline
 from .transformers import (
     set_transformer_in_out,
@@ -7,46 +6,57 @@ from .transformers import (
     ColumnRenamer,
 )
 
-"""The pipeasy-spark package provides a set of convenience classes and functions that
-make it easier to map each column of a Spark dataframe (or subsets of columns) to
-user-specified transformations. Increasingly complex features are provided:
 
-
-map_by_column()     allows mapping transformations at a more detailed level. Each column
-                    of the dataframe (or subset thereof) can be assigned a specific
-                    sequence of transformations.
-
-Each function returns a pyspark.ml Pipeline object.
-
-"""
-
-
-def map_by_column(columns_mapping):
+def build_pipeline(column_transformers):
     """Create a dataframe transformation pipeline.
+
+    The created pipeline can be used to apply successive transformations
+    on a spark dataframe. The transformations are intended to be applied
+    per column.
 
     Example
     -------
 
-        >>> df.show(1)
-        ....
-        >>> pipeline = map_by_column({
-                'species': [StringIndexer(), OneHotEncoder()],
-                'sepal_length': [StandardScaler()],
-        })
-        >>> df_transormed = pipeline.fit_transform(df)
+        >>> df = titanic.select('Survived', 'Sex', 'Age').dropna()
+        >>> df.show(2)
+        +--------+------+----+
+        |Survived|   Sex| Age|
+        +--------+------+----+
+        |       0|  male|22.0|
+        |       1|female|38.0|
+        +--------+------+----+
+        >>> pipeline = build_pipeline({
+                # 'Survived' : this variable is not modified, it can also be omitted from the dict
+                'Survived': [],
+                'Sex': [StringIndexer(), OneHotEncoderEstimator(dropLast=False)],
+                # 'Age': a VectorAssembler must be applied before the StandardScaler
+                # as the latter only accepts vectors as input.
+                'Age': [VectorAssembler(), StandardScaler()]
+            })
+        >>> trained_pipeline = pipeline.fit(df)
+        >>> trained_pipeline.transform(df).show(2)
+        +--------+-------------+--------------------+
+        |Survived|          Sex|                 Age|
+        +--------+-------------+--------------------+
+        |       0|(2,[0],[1.0])|[1.5054181442954726]|
+        |       1|(2,[1],[1.0])| [2.600267703783089]|
+        +--------+-------------+--------------------+
 
 
     Parameters
     ----------
-        columns_mapping: dict
+        column_transformers: dict(str -> list)
+            key (str): column name; value (list): transformer instances
+            (typically instances of pyspark.ml.feature transformers)
 
     Returns
     -------
-        pipeline: a pyspark pipeline
+        pipeline: a pyspark.ml.Pipeline instance
+
     """
     stages = []
 
-    for column, transformers in columns_mapping.items():
+    for column, transformers in column_transformers.items():
         temp_column_names = [column]
 
         for transformer in transformers:

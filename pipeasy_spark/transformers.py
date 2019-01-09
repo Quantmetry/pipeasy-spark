@@ -3,6 +3,7 @@ import pyspark.ml.feature
 
 
 def set_transformer_in_out(transformer, inputCol, outputCol):
+    """Set input and output column(s) of a transformer instance."""
     transformer = transformer.copy()
     try:
         transformer.setInputCol(inputCol)
@@ -10,7 +11,11 @@ def set_transformer_in_out(transformer, inputCol, outputCol):
         try:
             transformer.setInputCols([inputCol])
         except AttributeError:
-            raise ValueError("Invalid transformer: " + str(transformer.__class__))
+            message = (
+                "Invalid transformer (doesn't have setInputCol or setInputCols): ",
+                str(transformer.__class__)
+            )
+            raise ValueError(message)
 
     try:
         transformer.setOutputCol(outputCol)
@@ -26,6 +31,7 @@ def set_transformer_in_out(transformer, inputCol, outputCol):
 
 
 class ColumnDropper(pyspark.ml.Transformer, pyspark.ml.feature.HasInputCols):
+    """Transformer to drop several columns from a dataset."""
     def __init__(self, inputCols=None):
         super().__init__()
         self.setInputCols(inputCols)
@@ -37,6 +43,7 @@ class ColumnDropper(pyspark.ml.Transformer, pyspark.ml.feature.HasInputCols):
 class ColumnRenamer(pyspark.ml.Transformer,
                     pyspark.ml.feature.HasInputCol,
                     pyspark.ml.feature.HasOutputCol):
+    """Transformer to rename a column to another."""
     def __init__(self, inputCol=None, outputCol=None):
         super().__init__()
         self.setInputCol(inputCol)
