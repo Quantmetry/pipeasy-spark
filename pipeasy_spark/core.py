@@ -5,7 +5,6 @@ from .transformers import (
     set_transformer_in_out,
     ColumnDropper,
     ColumnRenamer,
-    FeatureBuilder,
 )
 
 """The pipeasy-spark package provides a set of convenience classes and functions that
@@ -22,7 +21,7 @@ Each function returns a pyspark.ml Pipeline object.
 """
 
 
-def map_by_column(columns_mapping, target_name=None):
+def map_by_column(columns_mapping):
     """Create a dataframe transformation pipeline.
 
     Example
@@ -40,8 +39,6 @@ def map_by_column(columns_mapping, target_name=None):
     Parameters
     ----------
         columns_mapping: dict
-        target_name: str
-            name of the target column that will be converted using StringIndexer()
 
     Returns
     -------
@@ -66,9 +63,6 @@ def map_by_column(columns_mapping, target_name=None):
         stages.append(ColumnRenamer(
             temp_column_names[-1], temp_column_names[0]
         ))
-
-    if target_name:
-        stages.append(FeatureBuilder(targetCol=target_name))
 
     # Create a Pipeline
     pipeline = Pipeline(stages=stages)

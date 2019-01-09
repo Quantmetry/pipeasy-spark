@@ -44,15 +44,3 @@ class ColumnRenamer(pyspark.ml.Transformer,
 
     def transform(self, dataset):
         return dataset.withColumnRenamed(self.getInputCol(), self.getOutputCol())
-
-
-class FeatureBuilder(pyspark.ml.Transformer):
-    def __init__(self, targetCol):
-        super().__init__()
-        self.targetCol = targetCol
-
-    def transform(self, dataset):
-        columns_to_regroup = [col for col in dataset.columns if col != self.targetCol]
-        actual_transformer = pyspark.ml.feature.VectorAssembler(inputCols=columns_to_regroup,
-                                                                outputCol='features')
-        return actual_transformer.transform(dataset)
