@@ -67,12 +67,14 @@ def build_pipeline(column_transformers):
             transformer = set_transformer_in_out(transformer, previous_column, next_column)
             stages.append(transformer)
 
-        # all the temporary columns should be dropped except the last one
-        stages.append(ColumnDropper(inputCols=temp_column_names[:-1]))
-        # the last temporary column should be renamed to the original name
-        stages.append(ColumnRenamer(
-            temp_column_names[-1], temp_column_names[0]
-        ))
+        if len(temp_column_names) > 1:
+            # all the temporary columns should be dropped except the last one
+            stages.append(ColumnDropper(inputCols=temp_column_names[:-1]))
+            # the last temporary column should be renamed to the original name
+            # (this needs to append AFTER dropping the original column)
+            stages.append(ColumnRenamer(
+                temp_column_names[-1], temp_column_names[0]
+            ))
 
     # Create a Pipeline
     pipeline = Pipeline(stages=stages)
