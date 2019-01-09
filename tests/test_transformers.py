@@ -106,6 +106,7 @@ def test_ColumnRenamer(spark):
 
 @pytest.fixture
 def pyspark_transformers(spark):
+    """list all transformer classes in pyspark.ml.feature"""
     def is_transformer(obj):
         return (
             inspect.getmodule(obj) == pyspark.ml.feature

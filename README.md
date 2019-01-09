@@ -137,6 +137,18 @@ As of this writing, these are the transformers from `pyspark.ml.feature` that ar
 ]
 ```
 
+These are not supported as it is not possible to specity the input column(s).
+
+```python
+[
+    ChiSqSelector(numTopFeatures=50, featuresCol='features', outputCol=None, labelCol='label', selectorType='numTopFeatures', percentile=0.1, fpr=0.05, fdr=0.05, fwe=0.05),
+    LSHParams(),
+    RFormula(formula=None, featuresCol='features', labelCol='label', forceIndexLabel=False, stringIndexerOrderType='frequencyDesc', handleInvalid='error'),
+    SQLTransformer(statement=None)
+]
+```
+
+
 # Contributing
 
 In order to contribute to the project, here is how you should configure your local development environment:
