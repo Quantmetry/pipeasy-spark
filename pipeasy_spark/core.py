@@ -45,13 +45,13 @@ def build_pipeline(column_transformers):
 
     Parameters
     ----------
-        column_transformers: dict(str -> list)
-            key (str): column name; value (list): transformer instances
-            (typically instances of pyspark.ml.feature transformers)
+    column_transformers: dict(str -> list)
+        key (str): column name; value (list): transformer instances
+        (typically instances of pyspark.ml.feature transformers)
 
     Returns
     -------
-        pipeline: a pyspark.ml.Pipeline instance
+    pipeline: a pyspark.ml.Pipeline instance (untrained)
 
     """
     stages = []
