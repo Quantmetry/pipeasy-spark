@@ -1,4 +1,5 @@
-import pyspark
+import pyspark.ml
+import pyspark.ml.feature
 
 
 def set_transformer_in_out(transformer, inputCol, outputCol):
