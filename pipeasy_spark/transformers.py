@@ -10,7 +10,7 @@ def set_transformer_in_out(transformer, inputCol, outputCol):
         try:
             transformer.setInputCols([inputCol])
         except AttributeError:
-            raise ValueError("Invalid transformer: " + str(transformer))
+            raise ValueError("Invalid transformer: " + str(transformer.__class__))
 
     try:
         transformer.setOutputCol(outputCol)
@@ -25,13 +25,13 @@ def set_transformer_in_out(transformer, inputCol, outputCol):
     return transformer
 
 
-class ColumnDropper(pyspark.ml.Transformer, pyspark.ml.feature.HasInputCol):
-    def __init__(self, inputCol=None):
+class ColumnDropper(pyspark.ml.Transformer, pyspark.ml.feature.HasInputCols):
+    def __init__(self, inputCols=None):
         super().__init__()
-        self.setInputCol(inputCol)
+        self.setInputCols(inputCols)
 
     def transform(self, dataset):
-        return dataset.drop(self.getInputCol())
+        return dataset.drop(*self.getInputCols())
 
 
 class ColumnRenamer(pyspark.ml.Transformer,

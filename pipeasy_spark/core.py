@@ -50,23 +50,22 @@ def map_by_column(columns_mapping, target_name=None):
     stages = []
 
     for column, transformers in columns_mapping.items():
-        if transformers:
-            temp_column_names = [column]
-            for transformer in transformers:
-                previous_column = temp_column_names[-1]
-                next_column = previous_column + '_' + transformer.__class__.__name__
-                temp_column_names.append(next_column)
+        temp_column_names = [column]
 
-                transformer = set_transformer_in_out(transformer, previous_column, next_column)
-                stages.append(transformer)
+        for transformer in transformers:
+            previous_column = temp_column_names[-1]
+            next_column = previous_column + '_' + transformer.__class__.__name__
+            temp_column_names.append(next_column)
 
-            # all the temporary columns should be dropped except the last one
-            for column in temp_column_names[:-1]:
-                stages.append(ColumnDropper(inputCol=column))
-            # the last temporary column should be renamed to the original name
-            stages.append(ColumnRenamer(
-                temp_column_names[-1], temp_column_names[0]
-            ))
+            transformer = set_transformer_in_out(transformer, previous_column, next_column)
+            stages.append(transformer)
+
+        # all the temporary columns should be dropped except the last one
+        stages.append(ColumnDropper(inputCols=temp_column_names[:-1]))
+        # the last temporary column should be renamed to the original name
+        stages.append(ColumnRenamer(
+            temp_column_names[-1], temp_column_names[0]
+        ))
 
     if target_name:
         stages.append(FeatureBuilder(targetCol=target_name))
