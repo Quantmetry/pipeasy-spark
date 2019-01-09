@@ -2,11 +2,8 @@
 
 
 [![pypi badge](https://img.shields.io/pypi/v/pipeasy_spark.svg)](https://pypi.python.org/pypi/pipeasy_spark)
-
 [![](https://img.shields.io/travis/Quantmetry/pipeasy-spark.svg)](https://travis-ci.org/Quantmetry/pipeasy-spark)
-
 [![documentation badge](https://readthedocs.org/projects/pipeasy-spark/badge/?version=latest)](https://readthedocs.org/projects/pipeasy-spark/)
-
 [![pyup badge](https://pyup.io/repos/github/BenjaminHabert/pipeasy_spark/shield.svg)](https://pyup.io/repos/github/BenjaminHabert/pipeasy_spark/)
 
 
@@ -16,8 +13,131 @@ an easy way to define preprocessing data pipelines for pysparark
 * Free software: MIT license
 * Documentation: https://pipeasy-spark.readthedocs.io.
 
+# Documentation
 
-# Development environnment
+https://pipeasy-spark.readthedocs.io/en/latest/
+
+# Installation
+
+
+```
+pip install pipeasy-spark
+```
+
+# Usage
+
+The goal of this package is to easily create a `pyspark.ml.Pipeline` instance that can
+transform the columns of a `pyspark.sql.Dataframe` in order to prepare it for a regressor or classifier.
+
+
+Assuming we have the `titanic` dataset as a Dataframe:
+
+```python
+df = titanic.select('Survived', 'Sex', 'Age').dropna()
+df.show(2)
+# +--------+------+----+
+# |Survived|   Sex| Age|
+# +--------+------+----+
+# |       0|  male|22.0|
+# |       1|female|38.0|
+# +--------+------+----+
+```
+
+A basic transformation pipeline can be created as follows. We define for each
+column of the dataframe a list of transformers that are applied sequencially.
+Each transformer is an instance of a transformer from `pyspark.ml.feature`.
+Notice that we do not provide the parameters `inputCol` or `outputCol` to
+these transformers.
+
+```python
+from pipeasy_spark import build_pipeline
+from pyspark.ml.feature import (
+    StringIndexer,
+    OneHotEncoderEstimator,
+    VectorAssembler,
+    StandardScaler,
+)
+
+pipeline = build_pipeline(column_transformers={
+    # 'Survived' : this variable is not modified, it can also be omitted from the dict
+    'Survived': [],
+    'Sex': [StringIndexer(), OneHotEncoderEstimator(dropLast=False)],
+    # 'Age': a VectorAssembler must be applied before the StandardScaler
+    # as the latter only accepts vectors as input.
+    'Age': [VectorAssembler(), StandardScaler()]
+})
+trained_pipeline = pipeline.fit(df)
+trained_pipeline.transform(df).show(2)
+# +--------+-------------+--------------------+
+# |Survived|          Sex|                 Age|
+# +--------+-------------+--------------------+
+# |       0|(2,[0],[1.0])|[1.5054181442954726]|
+# |       1|(2,[1],[1.0])| [2.600267703783089]|
+# +--------+-------------+--------------------+
+```
+
+This preprocessing pipeline can be included in a full prediction pipeline :
+
+```python
+from pyspark.ml import Pipeline
+from pyspark.ml.classification import LogisticRegression
+
+full_pipeline = Pipeline(stages=[
+    *pipeline.getStages(),
+    # all the features have to be assembled in a single column:
+    VectorAssembler(inputCols=['Sex', 'Age'], outputCol='features'),
+    LogisticRegression(featuresCol='features', labelCol='Survived')
+])
+
+trained_predictor = full_pipeline.fit(df)
+trained_predictor.transform(df).show(2)
+# +--------+-------------+--------------------+--------------------+--------------------+--------------------+----------+
+# |Survived|          Sex|                 Age|            features|       rawPrediction|         probability|prediction|
+# +--------+-------------+--------------------+--------------------+--------------------+--------------------+----------+
+# |       0|(2,[0],[1.0])|[1.5054181442954726]|[1.0,0.0,1.505418...|[2.03811507112527...|[0.88474119316485...|       0.0|
+# |       1|(2,[1],[1.0])| [2.600267703783089]|[0.0,1.0,2.600267...|[-0.7360149659890...|[0.32387617489886...|       1.0|
+# +--------+-------------+--------------------+--------------------+--------------------+--------------------+----------+
+```
+
+As of this writing, these are the transformers from `pyspark.ml.feature` that are supported:
+
+```python
+[
+    Binarizer(threshold=0.0, inputCol=None, outputCol=None),
+    BucketedRandomProjectionLSH(inputCol=None, outputCol=None, seed=None, numHashTables=1, bucketLength=None),
+    Bucketizer(splits=None, inputCol=None, outputCol=None, handleInvalid='error'),
+    CountVectorizer(minTF=1.0, minDF=1.0, vocabSize=262144, binary=False, inputCol=None, outputCol=None),
+    DCT(inverse=False, inputCol=None, outputCol=None),
+    ElementwiseProduct(scalingVec=None, inputCol=None, outputCol=None),
+    FeatureHasher(numFeatures=262144, inputCols=None, outputCol=None, categoricalCols=None),
+    HashingTF(numFeatures=262144, binary=False, inputCol=None, outputCol=None),
+    IDF(minDocFreq=0, inputCol=None, outputCol=None),
+    Imputer(strategy='mean', missingValue=nan, inputCols=None, outputCols=None),
+    IndexToString(inputCol=None, outputCol=None, labels=None),
+    MaxAbsScaler(inputCol=None, outputCol=None),
+    MinHashLSH(inputCol=None, outputCol=None, seed=None, numHashTables=1),
+    MinMaxScaler(min=0.0, max=1.0, inputCol=None, outputCol=None),
+    NGram(n=2, inputCol=None, outputCol=None),
+    Normalizer(p=2.0, inputCol=None, outputCol=None),
+    OneHotEncoder(dropLast=True, inputCol=None, outputCol=None),
+    OneHotEncoderEstimator(inputCols=None, outputCols=None, handleInvalid='error', dropLast=True),
+    PCA(k=None, inputCol=None, outputCol=None),
+    PolynomialExpansion(degree=2, inputCol=None, outputCol=None),
+    QuantileDiscretizer(numBuckets=2, inputCol=None, outputCol=None, relativeError=0.001, handleInvalid='error'),
+    RegexTokenizer(minTokenLength=1, gaps=True, pattern='\\\\s+', inputCol=None, outputCol=None, toLowercase=True),
+    StandardScaler(withMean=False, withStd=True, inputCol=None, outputCol=None),
+    StopWordsRemover(inputCol=None, outputCol=None, stopWords=None, caseSensitive=False),
+    StringIndexer(inputCol=None, outputCol=None, handleInvalid='error', stringOrderType='frequencyDesc'),
+    Tokenizer(inputCol=None, outputCol=None),
+    VectorAssembler(inputCols=None, outputCol=None),
+    VectorIndexer(maxCategories=20, inputCol=None, outputCol=None, handleInvalid='error'),
+    VectorSizeHint(inputCol=None, size=None, handleInvalid='error'),
+    VectorSlicer(inputCol=None, outputCol=None, indices=None, names=None),
+    Word2Vec(vectorSize=100, minCount=5, numPartitions=1, stepSize=0.025, maxIter=1, seed=None, inputCol=None, outputCol=None, windowSize=5, maxSentenceLength=1000)
+]
+```
+
+# Contributing
 
 In order to contribute to the project, here is how you should configure your local development environment:
 
@@ -73,8 +193,7 @@ In order to contribute to the project, here is how you should configure your loc
   flake8 configuration options are specified in the `tox.ini` file.
 
 
-Notes on setting up the project
--------------------------------
+# Notes on setting up the project
 
 - I setup the project using [this cookiecutter project](https://cookiecutter-pypackage.readthedocs.io/en/latest/readme.html#features)
 - create a local virtual environnment and activate it
@@ -161,15 +280,3 @@ Notes on setting up the project
 Note: when Omar pushed new commits, travis does not report their status.
 
 - I update `setup.py` to add the dependence to `pyspark`. I also modify slightly the development setup (see Development section above).
-
-Features
---------
-
-* TODO
-
-Credits
--------
-
-This package was created with [Cookiecutter](https://github.com/audreyr/cookiecutter)
-and the [`audreyr/cookiecutter-pypackage`](https://github.com/audreyr/cookiecutter-pypackage) project template.
-
