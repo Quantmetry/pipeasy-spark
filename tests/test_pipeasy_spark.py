@@ -4,11 +4,7 @@ import pytest
 
 import pyspark
 
-from pipeasy_spark import pipeasy_spark
-
-
-def test_dummy():
-    assert True
+import pipeasy_spark as ppz
 
 
 @pytest.fixture(scope='session')
@@ -27,6 +23,6 @@ def test_spark(spark):
         ('Omar', 178.1, 1),
     ], schema=['name', 'height', 'target'])
 
-    pipeline = pipeasy_spark.map_by_dtypes(df, 'target', [], [])
+    pipeline = ppz.map_by_dtypes(df, 'target', [], [])
 
     assert isinstance(pipeline, pyspark.ml.Pipeline)
