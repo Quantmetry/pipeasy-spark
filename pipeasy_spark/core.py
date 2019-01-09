@@ -48,8 +48,6 @@ def map_by_column(columns_mapping, target_name=None):
         pipeline: a pyspark pipeline
     """
     stages = []
-    columns_to_drop = []
-    columns_to_rename = []
 
     for column, transformers in columns_mapping.items():
         if transformers:
@@ -63,18 +61,16 @@ def map_by_column(columns_mapping, target_name=None):
                 stages.append(transformer)
 
             # all the temporary columns should be dropped except the last one
-            columns_to_drop += temp_column_names[:-1]
+            for column in temp_column_names[:-1]:
+                stages.append(ColumnDropper(inputCol=column))
             # the last temporary column should be renamed to the original name
-            columns_to_rename.append(
-                (temp_column_names[-1], temp_column_names[0])
-            )
-    for column in columns_to_drop:
-        stages.append(ColumnDropper(inputCol=column))
-    for original, new in columns_to_rename:
-        stages.append(ColumnRenamer(original, new))
+            stages.append(ColumnRenamer(
+                temp_column_names[-1], temp_column_names[0]
+            ))
 
     if target_name:
         stages.append(FeatureBuilder(targetCol=target_name))
+
     # Create a Pipeline
     pipeline = Pipeline(stages=stages)
     return pipeline
