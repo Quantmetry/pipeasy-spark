@@ -83,7 +83,7 @@ from pyspark.ml import Pipeline
 from pyspark.ml.classification import LogisticRegression
 
 full_pipeline = Pipeline(stages=[
-    *pipeline.getStages(),
+    pipeline,
     # all the features have to be assembled in a single column:
     VectorAssembler(inputCols=['Sex', 'Age'], outputCol='features'),
     LogisticRegression(featuresCol='features', labelCol='Survived')
