@@ -13,6 +13,10 @@ an easy way to define preprocessing data pipelines for pysparark
 * Free software: MIT license
 * Documentation: https://pipeasy-spark.readthedocs.io.
 
+Verified compatibility:
+- python 3.5 -> 3.7
+- pyspark 2.1 -> 2.4
+
 # Documentation
 
 https://pipeasy-spark.readthedocs.io/en/latest/
