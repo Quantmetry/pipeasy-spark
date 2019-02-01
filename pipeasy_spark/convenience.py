@@ -1,27 +1,13 @@
-# -*- coding: utf-8 -*-
-
-"""Main module."""
+"""
+map_by_dtypes()     allows a simple mapping of features to user-specified transformations
+                    according to their dtypes. Each dtype is assigned the sequence of
+                    transformations passed in the arguments as dictionaries.
+"""
 from pyspark.ml import Pipeline
 from pyspark.ml.feature import (
     StringIndexer,
     VectorAssembler,
 )
-
-"""The pipeasy-spark package provides a set of convenience classes and functions that
-make it easier to map each column of a Spark dataframe (or subsets of columns) to
-user-specified transformations. Increasingly complex features are provided:
-
-map_by_dtypes()     allows a simple mapping of features to user-specified transformations
-                    according to their dtypes. Each dtype is assigned the sequence of
-                    transformations passed in the arguments as dictionaries.
-
-map_by_column()     allows mapping transformations at a more detailed level. Each column
-                    of the dataframe (or subset thereof) can be assigned a specific
-                    sequence of transformations.
-
-Each function returns a pyspark.ml Pipeline object.
-
-"""
 
 
 def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
