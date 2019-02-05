@@ -86,3 +86,9 @@ dist: clean ## builds source and wheel package
 
 install: clean ## install the package to the active Python's site-packages
 	pip install -e .
+
+install_demo: install ## install additional packages to allow demo notebook to run
+	pip install -r requirements_demo.txt
+
+notebook: install_demo ## launch jupyter notebook
+	jupyter notebook
