@@ -7,7 +7,11 @@
 [![pyup badge](https://pyup.io/repos/github/BenjaminHabert/pipeasy_spark/shield.svg)](https://pyup.io/repos/github/BenjaminHabert/pipeasy_spark/)
 
 
-an easy way to define preprocessing data pipelines for pysparark
+`pipeasy-spark` provides an easy way to define a preprocessing data [pipeline for pyspark](https://spark.apache.org/docs/latest/ml-pipeline.html).
+
+This is similar to what [DataframeMapper](https://github.com/scikit-learn-contrib/sklearn-pandas#transformation-mapping)
+or [ColumnTransformer](https://scikit-learn.org/stable/modules/generated/sklearn.compose.ColumnTransformer.html)
+do for `scikit-learn`.
 
 
 * Free software: MIT license
