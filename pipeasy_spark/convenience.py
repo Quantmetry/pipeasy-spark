@@ -1,106 +1,74 @@
-"""
-map_by_dtypes()     allows a simple mapping of features to user-specified transformations
-                    according to their dtypes. Each dtype is assigned the sequence of
-                    transformations passed in the arguments as dictionaries.
-"""
-from pyspark.ml import Pipeline
 from pyspark.ml.feature import (
     StringIndexer,
+    OneHotEncoderEstimator,
     VectorAssembler,
+    StandardScaler,
 )
+from pyspark.sql.types import NumericType, StringType
+
+from .core import build_pipeline
 
 
-def map_by_dtypes(df_pipe, target_name, cat_transformers, num_transformers):
-    """Maps the columns of a dataframe to specific transformations depending on their
-    dtype.
+def build_pipeline_by_dtypes(
+    dataframe,
+    exclude_columns=tuple(),
+    string_transformers=tuple(),
+    numeric_transformers=tuple(),
+):
+    """Build simple transformation pipeline (untrained) for the given dataframe.
 
-    Categorical columns are taken through the cat_stransformers sequence
-    (StringIndexer > OneHotEncoder for example) and numerical ones through the
-    num_transformers sequence (VectorAssembler > StandardScaler for example).
-    The target variable is set in the arguments and a StringIndexer is applied to it.
-    The transformed features are then assembled by a VectorAssembler and a pyspark.ml
-    pipeline object is returned.
+    Parameters
+    ----------
+    dataframe: pyspark.sql.Dataframe
+        only the schema of the dataframe is used, not actual data.
+    exclude_columns: list of str
+        name of columns for which we want no transformation to apply.
+    string_transformers: list of transformer instances
+        The successive transformations that will be applied to string columns
+        Each element is an instance of a pyspark.ml.feature transformer class.
+    numeric_transformers: list of transformer instances
+        The successive transformations that will be applied to numeric columns
+        Each element is an instance of a pyspark.ml.feature transformer class.
 
-    Parameters:
-
-    df_pipe             a Spark dataframe to be transformed
-    target_name         the name of the target column
-    cat_transformers    list of pyspark.ml transformers for categorical columns
-    num_transformers    list of pyspark.ml transformers for numerical columns
-
-    TODO:
-    Handle unseen labels.
-
-    DONE:
-    Make the user choose which transformations are to be applied for each dtype.
-    Maybe pass dtypes as dictionaries as opposed to the string/not string dichotomy.
-
-    Tested with the following transformers :
-    import pipeasy_spark as ppz
-    from pyspark.ml.feature import (
-        OneHotEncoderEstimator,
-        StringIndexer,
-        VectorAssembler,
-        StandardScaler,
-    )
-    ppz_pipeline= ppz.map_by_dtypes(df_pipe,
-                                    target_name='Survived',
-                                    cat_transformers=[StringIndexer, OneHotEncoderEstimator],
-                                    num_transformers=[VectorAssembler, StandardScaler])
+    Returns
+    -------
+    pipeline: pyspark.ml.Pipeline instance (untrained)
 
     """
-    cat_columns = [item[0] for item in df_pipe.dtypes if item[1] == 'string']
-    num_columns = [item[0] for item in df_pipe.dtypes if (not item[1] == 'string'
-                                                          and not item[0] == target_name)]
+    column_transformers = {}
 
-    stages = []
-    # Preparing categorical columns
-    for cat_column in cat_columns:
-        # Chain transformers
-        cat_column_stages = []
-        for idx, transformer in enumerate(cat_transformers):
-            if idx == 0:
-                transformer_args = dict(
-                    inputCol=cat_column,
-                    outputCol=cat_column + '_indexed'
-                )
-            else:
-                transformer_args = dict(
-                    inputCols=[cat_column_stages[idx - 1].getOutputCol()],
-                    outputCols=[cat_column + '_transformed']
-                )
-            cat_column_stages += [transformer(**transformer_args)]
+    for field in dataframe.schema:
+        column, dtype = field.name, field.dataType
+        if column not in exclude_columns:
+            if isinstance(dtype, NumericType):
+                column_transformers[column] = numeric_transformers
+            elif isinstance(dtype, StringType):
+                column_transformers[column] = string_transformers
 
-        # Add stages to main stages list
-        stages += cat_column_stages
+    return build_pipeline(column_transformers)
 
-    # Preparing numerical columns
-    for num_column in num_columns:
-        # Chain transformers
-        num_column_stages = []
-        for idx, transformer in enumerate(num_transformers):
-            if idx == 0:
-                transformer_args = dict(
-                    inputCols=[num_column],
-                    outputCol=num_column + '_assembled')
-            else:
-                transformer_args = dict(
-                    inputCol=num_column_stages[idx - 1].getOutputCol(),
-                    outputCol=num_column + '_scaled')
-            num_column_stages += [transformer(**transformer_args)]
 
-        # Add stages to main stages list
-        stages += num_column_stages
+def build_default_pipeline(dataframe, exclude_columns=tuple()):
+    """Build simple transformation pipeline (untrained) for the given dataframe.
 
-    # Preparing target variable
-    label_indexer = StringIndexer(inputCol=target_name, outputCol='label')
-    stages += [label_indexer]
+    By defaults numeric columns are processed with StandardScaler and string columns
+    are processed with StringIndexer + OneHotEncoderEstimator
 
-    # Combine everything
-    assembler_inputs = [c+'_transformed' for c in cat_columns] + [c+'_scaled' for c in num_columns]
-    assembler = VectorAssembler(inputCols=assembler_inputs, outputCol='features')
-    stages += [assembler]
+    Parameters
+    ----------
+        dataframe: pyspark.sql.Dataframe
+            only the schema of the dataframe is used, not actual data.
+        exclude_columns: list of str
+            name of columns for which we want no transformation to apply.
 
-    # Create a Pipeline
-    pipeline = Pipeline(stages=stages)
-    return pipeline
+    Returns
+    -------
+    pipeline: pyspark.ml.Pipeline instance (untrained)
+
+    """
+    return build_pipeline_by_dtypes(
+        dataframe,
+        exclude_columns=exclude_columns,
+        string_transformers=(StringIndexer(), OneHotEncoderEstimator()),
+        numeric_transformers=(VectorAssembler(), StandardScaler()),
+    )

@@ -164,12 +164,9 @@ In order to contribute to the project, here is how you should configure your loc
     $ git clone git@github.com:Quantmetry/pipeasy-spark.git
     $ cd pipeasy-spark
     # creating the virtual environnment and activating it
-    $ python3 -m venv .venv
-    $ source .venv/bin./activate
-    # installing the developpment dependencies (pytest, flake8, etc.)
-    (.venv) $ pip install -r requirements_dev.txt
-    # installing the project dependencies
-    (.venv) $ make install
+    $ make install_dev
+    $ source .venv/bin/activate
+    (.venv) $ make test
     # start the demo notebook
     (.venv) $ make notebook
     ```
