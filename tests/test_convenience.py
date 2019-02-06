@@ -36,7 +36,7 @@ def test_build_pipeline_by_dtypes_with_obvious_transformers(
     assert get_target_values(df) == get_target_values(df_transformed)
 
 
-def test_build_default_pipeline_calls_other_method(spark, mocker):
+def test_build_default_pipeline_calls_other_method(spark):
     df = spark.createDataFrame(
         [("Benjamin", 178.1, 0), ("Omar", 178.1, 1)],
         schema=["name", "height", "target"],
