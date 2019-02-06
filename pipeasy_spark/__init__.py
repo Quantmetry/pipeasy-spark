@@ -9,7 +9,7 @@ user-specified transformations.
 
 __author__ = """Quantmetry"""
 __email__ = 'bhabert@quantmetry.com'
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 from .core import build_pipeline
 from .convenience import (
