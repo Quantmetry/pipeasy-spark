@@ -4,10 +4,26 @@ pipeasy\_spark package
 Submodules
 ----------
 
-pipeasy\_spark.pipeasy\_spark module
-------------------------------------
+pipeasy\_spark.convenience module
+---------------------------------
 
-.. automodule:: pipeasy_spark.pipeasy_spark
+.. automodule:: pipeasy_spark.convenience
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pipeasy\_spark.core module
+--------------------------
+
+.. automodule:: pipeasy_spark.core
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pipeasy\_spark.transformers module
+----------------------------------
+
+.. automodule:: pipeasy_spark.transformers
     :members:
     :undoc-members:
     :show-inheritance:

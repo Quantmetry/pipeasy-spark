@@ -34,13 +34,13 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/BenjaminHabert/pipeasy_spark
+    $ git clone git://github.com/Quantmetry/pipeasy-spark
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/BenjaminHabert/pipeasy_spark/tarball/master
+    $ curl  -OL https://github.com/Quantmetry/pipeasy-spark/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -49,5 +49,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/BenjaminHabert/pipeasy_spark
-.. _tarball: https://github.com/BenjaminHabert/pipeasy_spark/tarball/master
+.. _Github repo: https://github.com/Quantmetry/pipeasy-spark
+.. _tarball: https://github.com/Quantmetry/pipeasy-spark/tarball/master
